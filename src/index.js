@@ -14,7 +14,15 @@ import '@/styles/index.scss'
 
 import Vue from 'vue/dist/vue.esm'
 
-let throttle = function(fn, delay, mustRunDelay) {
+const freezeObj = function(obj) {
+  Object.freeze(obj)
+  Object.keys(obj).forEach(function(key, value) {
+    if (typeof obj[key] === 'object') {
+      freezeObj(obj[key]) //递归方法，继续调用
+    }
+  })
+}
+const throttle = function(fn, delay, mustRunDelay) {
   let timer = null
   let t_start
   return function() {
@@ -58,6 +66,7 @@ let throttle = function(fn, delay, mustRunDelay) {
   let lines = text.split('\n')
     .map((line, index) =>
       ({ line, showBookmark: false, index }))
+  freezeObj(lines)
   document.querySelector('body').innerHTML = '<div id="app"></div>'
   document.querySelector('head').innerHTML += `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">`
   new Vue({
@@ -100,7 +109,7 @@ let throttle = function(fn, delay, mustRunDelay) {
             v-for="line in showLines"
             :key="line.index"
           >
-            <span>{{ line.line }}</span>
+            <span v-html="line.line" />
             <button class="bookmark btn" @click="addBookmark(line)">
               添加书签
             </button>

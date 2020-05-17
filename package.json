@@ -1,6 +1,6 @@
 {
   "name": "nalomu-local-txt-reader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "在本地浏览器阅读TXT小说吧！",
   "main": "index.js",
   "author": "Nalomu",
