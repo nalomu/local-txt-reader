@@ -8,13 +8,18 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --open --env.NODE_ENV=development",
+    "start:local": "webpack-dev-server --open --env.NODE_ENV=development --env.local",
     "build:local": "webpack --env.NODE_ENV=production --env.local --progress",
     "build:cdn": "webpack --env.NODE_ENV=production --progress"
   },
   "dependencies": {
     "css-loader": "^3.5.3",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
     "style-loader": "^1.2.1",
     "vue": "^2.6.11",
+    "webpack-dev-server": "^3.11.0",
     "webpack-userscript": "^2.5.3"
   },
   "devDependencies": {
