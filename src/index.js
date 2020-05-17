@@ -14,11 +14,11 @@ import '@/styles/index.scss'
 
 import Vue from 'vue/dist/vue.esm'
 
-var throttle = function(fn, delay, mustRunDelay) {
-  var timer = null
-  var t_start
+let throttle = function(fn, delay, mustRunDelay) {
+  let timer = null
+  let t_start
   return function() {
-    var context = this, args = arguments, t_curr = +new Date()
+    let context = this, args = arguments, t_curr = +new Date()
 
     // 清除定时器
     clearTimeout(timer)
