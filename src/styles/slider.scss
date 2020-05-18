@@ -1,0 +1,44 @@
+.slider {
+  &-container {
+    height: 18px;
+    width: 100%; /* Width of the outside container */
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+  }
+
+  -webkit-appearance: none; /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 5px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  border-radius: 3px;
+
+  &:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 18px; /* Set a specific slider handle width */
+    height: 18px; /* Slider handle height */
+    border-radius: 50%;
+    background: #4c5caf; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+
+  &::-moz-range-thumb {
+    width: 18px; /* Set a specific slider handle width */
+    height: 18px; /* Slider handle height */
+    border-radius: 50%;
+    background: #4c5caf; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+}
