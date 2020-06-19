@@ -1,6 +1,6 @@
 {
   "name": "nalomu-local-txt-reader",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "在本地浏览器阅读TXT小说吧！",
   "main": "index.js",
   "author": "Nalomu",
@@ -13,25 +13,45 @@
     "build:local": "webpack --env.NODE_ENV=production --env.local --progress",
     "dev:cdn": "webpack --env.NODE_ENV=development --progress",
     "start:cdn": "webpack-dev-server --open --env.NODE_ENV=development",
-    "build:cdn": "webpack --env.NODE_ENV=production --progress"
+    "build:cdn": "webpack --env.NODE_ENV=production --progress",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.6.11"
+    "animate.css": "^4.1.0",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-property-decorator": "^8.4.2"
   },
   "devDependencies": {
-    "babel-polyfill": "^6.26.0",
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@types/node": "^13.13.4",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "@vue/cli-plugin-eslint": "^4.3.1",
+    "@vue/cli-plugin-typescript": "^4.3.1",
+    "@vue/cli-service": "^4.3.1",
+    "@vue/eslint-config-standard": "^5.1.2",
+    "@vue/eslint-config-typescript": "^5.0.2",
     "babel-loader": "^8.1.0",
     "babel-plugin-component": "^1.1.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "css-loader": "^3.5.3",
+    "eslint": "^7.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^6.0.0",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.2.1",
-    "ts-loader": "^7.0.4",
-    "typescript": "^3.9.2",
+    "ts-loader": "^7.0.5",
+    "tslint-config-standard": "^9.0.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^3.9.3",
     "vue-loader": "^15.9.2",
     "vue-material": "^1.0.0-beta-13",
     "vue-template-compiler": "^2.6.11",
@@ -39,5 +59,10 @@
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0",
     "webpack-userscript": "^2.5.3"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "vue-cli-service lint"
+    ]
   }
 }

@@ -8,11 +8,11 @@ module.exports = env => {
   const vueCdn = dev
     ? 'https://unpkg.com/vue@2.6.11/dist/vue.js'
     : 'https://cdn.jsdelivr.net/npm/vue@2.6.11'
-  const external_header = dev ? ['GM_xmlhttpRequest'] : []
+  const externalHeader = dev ? ['GM_xmlhttpRequest'] : []
   console.log(vueCdn)
   return {
     mode: dev ? 'development' : 'production',
-    entry: [ path.resolve(__dirname, 'src', 'index.js')],
+    entry: [path.resolve(__dirname, 'src', 'main.ts')],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename
@@ -21,6 +21,7 @@ module.exports = env => {
       contentBase: path.join(__dirname, 'dist')
     },
     resolve: {
+      extensions: ['.js', '.vue', '.json', '.ts'],
       alias: {
         '@': path.resolve(__dirname, 'src/')
       }
@@ -29,18 +30,19 @@ module.exports = env => {
       new WebpackUserscript({
         headers: {
           name: 'Nalomu local TXT reader',
-          version: dev ? `[version]-build.[buildNo]` : `[version]`,
+          version: dev ? '[version]-build.[buildNo]' : '[version]',
           updateURL: dev ? `http://127.0.0.1:8080/${filename}` : undefined,
           match: 'file:///*.txt',
           grant: [
             'GM_setValue',
             'GM_getValue',
-            ...external_header
+            ...externalHeader
           ],
           description: '在本地浏览器阅读TXT小说吧！',
           author: 'Nalomu',
           require: local ? ''
-            : [vueCdn]
+            : [vueCdn],
+          'run-at': 'document-body'
         },
         pretty: false,
         proxyScript: {
@@ -76,6 +78,18 @@ module.exports = env => {
       }, {
         test: /\.vue$/,
         loader: 'vue-loader'
+      }, {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        enforce: 'pre',
+        loader: 'tslint-loader'
+      }, {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
       }]
 
     },
