@@ -200,8 +200,8 @@ export default class App extends Vue {
   showBookmarks = false
 
   get contentHeight() {
-    console.log(this.$el.clientHeight)
-    return this.$el.clientHeight
+    console.log(document.body.clientHeight)
+    return document.body.clientHeight
   }
 
   throttle: Function = throttle
@@ -349,14 +349,18 @@ export default class App extends Vue {
   }
 
   get probablyLine(): number {
-    return Number((this.contentHeight / 39).toFixed(0))
+    return Number((this.contentHeight / 30).toFixed(0))
   }
 
   mounted() {
+    console.log(this.probablyLine)
+    console.log(this.currentPage.end)
     this.currentPage.prev = this.currentPage.end =
       this.currentPage.start + this.probablyLine
+    console.log(this.currentPage.prev)
+    console.log(this.nextPage.start)
     this.nextPage.end = this.nextPage.start + this.probablyLine
-
+    console.log(this.nextPage.end)
     const observer = new MutationObserver(this.throttle(this.checkHeight, 50))
     observer.observe((this.$refs.content as HTMLElement), { childList: true, subtree: true })
     window.addEventListener('resize', this.resetPrev)

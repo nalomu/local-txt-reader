@@ -1,5 +1,7 @@
 .slider {
+
   &-container {
+    z-index: 100;
     height: 18px;
     width: 100%; /* Width of the outside container */
     padding: 0 20px;
