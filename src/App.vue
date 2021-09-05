@@ -70,50 +70,28 @@
       class="content"
     >
       <!--为了减少内存占用重用组件-->
-      <transition-group mode="">
-        <div ref="prev" :key="prevPageLines.length ? prevPageLines[0].index : -1" class="page prev">
-          <template v-for="(line, index) in prevPageLines">
-            <div v-if="line" :key="index">
-              <span v-html="line.line" />
-              <button class="bookmark-add btn" @click="addBookmark(line)">
-                添加书签
-              </button>
-            </div>
-          </template>
-        </div>
-        <div ref="current" :key="showLines.length ? showLines[0].index : 0" class="page current">
-          <template v-for="(line, index) in showLines">
-            <div v-if="line" :key="index">
-              <span v-html="line.line" />
-              <button class="bookmark-add btn" @click="addBookmark(line)">
-                添加书签
-              </button>
-            </div>
-          </template>
-        </div>
-        <div ref="next" :key="nextPageLines.length ? nextPageLines[0].index : -2" class="page next">
-          <template v-for="(line, index) in nextPageLines">
-            <div v-if="line" :key="index">
-              <span v-html="line.line" />
-              <button class="bookmark-add btn" @click="addBookmark(line)">
-                添加书签
-              </button>
-            </div>
-          </template>
-        </div>
-      </transition-group>
+      <div ref="current" class="page current">
+        <template v-for="(line, index) in episodes">
+          <div v-if="line" :key="index">
+            <span v-html="line.line" />
+            <button class="bookmark-add btn" @click="addBookmark(line)">
+              添加书签
+            </button>
+          </div>
+        </template>
+      </div>
     </div>
     <div class="slider-container tooltip">
       <input
         type="range"
         min="0"
-        :value="currentPage.start"
+        :value="episode"
         :max="lines.length-1"
         class="slider"
         @input="handleRange"
       >
       <span class="tooltip-text">
-        <span v-html="textFilter(lines[currentPage.start].line)" /><br>
+        <span v-html="textFilter(episode.title)" /><br>
         {{ ((currentPage.start / (lines.length-1)).toFixed(2) * 100).toFixed(0) }}%/100%
       </span>
     </div>
@@ -123,123 +101,45 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { bookmarks, throttle, getLines } from '@/bootstrap.js'
+import { bookmarks, getLines, throttle } from '@/bootstrap.js'
 import { Watch } from 'vue-property-decorator'
-
-interface IPage {
-  start: number
-  end: number
-  prev: number | null
-  prevHeight: number | null
-  mountedKey: 'start' | 'end'
-  readonly height: number
-}
 
 interface ILine {
   line: string
   index: number
 }
 
+interface IEpisode {
+  lines: ILine[]
+  title: string
+  index: number
+}
+
 interface IBookmark {
   desc: string
-  index: number
+  episode: number
 }
 
 @Component({})
 export default class App extends Vue {
-  constructor() {
-    super()
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this
-    this.currentPage = {
-      start: 0,
-      end: 0,
-      prev: 0,
-      prevHeight: null,
-      mountedKey: 'start',
-      get height() {
-        return (self.$refs.current as HTMLElement).clientHeight
-      }
-    }
-    this.prevPage = {
-      start: 0,
-      get end() {
-        return self.currentPage.start
-      },
-      prev: 0,
-      prevHeight: null,
-      mountedKey: 'end',
-      get height() {
-        return (self.$refs.prev as HTMLElement).clientHeight
-      }
-    }
-
-    this.nextPage = {
-      get start() {
-        return self.currentPage.end
-      },
-      end: 0,
-      prev: 0,
-      prevHeight: null,
-      mountedKey: 'start',
-      get height() {
-        return (self.$refs.next as HTMLElement).clientHeight
-      }
-    }
-  }
-
-  currentPage: IPage
-  prevPage: IPage
-  nextPage: IPage
+  page = 0
+  activeEpisode = 0
 
   bookmarks: IBookmark[] = bookmarks
   lines: ILine[] = getLines()
-  episodes: ILine[] = []
+  episodes: IEpisode[] = []
 
   drawerOpen = false
   showBookmarks = false
-
-  get contentHeight() {
-    console.log(document.body.clientHeight)
-    return document.body.clientHeight
-  }
-
   throttle: Function = throttle
 
-  addBookmark(line: ILine): void {
-    this.bookmarks.push({ index: line.index, desc: line.line })
-    alert('添加成功')
+  get episode(): IEpisode {
+    return this.episodes[this.activeEpisode]
   }
 
-  checkHeight(): void {
-    // console.log(this.current.height)
-    for (const key of ['prevPage', 'currentPage', 'nextPage']) {
-      // for (const key of ['prevPage', 'nextPage']) {
-      // for (const key of ['currentPage']) {
-      if (this.currentPage.mountedKey === 'start') {
-        if (this[key].height > this.contentHeight) {
-          this[key].prev = this[key].end--
-        } else if (this[key].end + 1 !== this[key].prev &&
-          this[key].prevHeight !== this[key].height) {
-          this[key].prev = this[key].end++
-        }
-      } else {
-        if (this[key].height > this.contentHeight) {
-          this[key].prev = this[key].start++
-        } else if (this[key].start - 1 !== this[key].prev &&
-          this[key].prevHeight !== this[key].height) {
-          if (this[key].start <= 0) {
-            if (key === 'currentPage') {
-              this.currentPage.mountedKey = 'start'
-              this.resetPrev()
-            }
-          } else {
-            this[key].prev = this[key].start--
-          }
-        }
-      }
-      this[key].prevHeight = this[key].height
-    }
+  addBookmark(episode: IEpisode): void {
+    this.bookmarks.push({ episode: episode.index, desc: episode.lines[0]?.line })
+    alert('添加成功')
   }
 
   handlePage(event: KeyboardEvent | WheelEvent): void {
@@ -267,60 +167,29 @@ export default class App extends Vue {
   }
 
   jumpNextPage() {
-    if (this.currentPage.end < this.lines.length - 1) {
-      this.currentPage.mountedKey = 'start'
-      // this.currentPage.start = this.currentPage.end
-      const start = this.currentPage.end
-      this.currentPage.end = this.nextPage.end
-      this.currentPage.start = start
+    if (this.page >= this.maxPage) {
+      this.nextEpisode()
     }
-    this.resetPrev(true)
+    this.page++
   }
 
   jumpPrevPage() {
-    if (this.currentPage.start > 0) {
-      this.currentPage.mountedKey = 'end'
-      // this.currentPage.end = this.currentPage.start
-      const end = this.currentPage.start
-      this.currentPage.start = this.prevPage.start
-      this.currentPage.end = end
+    if (this.page <= 0) {
+      this.prevEpisode()
     }
-    this.resetPrev(true)
+    this.page--
+  }
+
+  get maxPage(): number {
+    return (this.$refs.current as HTMLElement).clientWidth
   }
 
   handleJump(index: number): void {
-    this.currentPage.mountedKey = 'start'
-    this.currentPage.start = index
-    this.resetPrev()
-  }
-
-  resetPrev(dontResetCurrent?: boolean | Event): void {
-    let keys
-    if (dontResetCurrent instanceof Event) {
-      keys = ['prevPage', 'currentPage', 'nextPage']
-    } else {
-      keys = dontResetCurrent ? ['prevPage', 'nextPage'] : ['prevPage', 'currentPage', 'nextPage']
-    }
-    // for (const key of ['prevPage', 'currentPage', 'nextPage']) {
-    for (const key of keys) {
-      // for (const key of ['currentPage']) {
-      this[key].prev = null
-      this[key].prevHeight = null
-      if (this[key].mountedKey === 'start') {
-        this[key].end = Number(Number(this[key].start + this.$el.clientHeight / 39).toFixed(0))
-      } else {
-        let temp = Number(Number(this[key].end - this.$el.clientHeight / 39).toFixed(0))
-        temp = temp < 0 ? 0 : temp
-        this[key].start = temp
-      }
-    }
-    this.checkHeight()
+    this.activeEpisode = index
   }
 
   handleRange(e: InputEvent): void {
-    this.currentPage.mountedKey = 'start'
-    this.currentPage.start = Number((e.target as HTMLInputElement).value)
-    this.resetPrev()
+    this.jumpEpisodes(Number((e.target as HTMLInputElement).value))
   }
 
   textFilter(text: string): string {
@@ -328,42 +197,25 @@ export default class App extends Vue {
   }
 
   async checkEpisodes() {
+    const matchedPoint: ILine[] = []
     this.lines.forEach((line: ILine) => {
       const matched = /^\s*第?([\d一二三四五六七八九十百千万]+)[章话話卷]/igs.exec(line.line)
       if (matched) {
-        this.episodes.push(line)
+        matchedPoint.push(line)
       }
     })
-  }
-
-  get showLines(): ILine[] {
-    return this.lines.slice(this.currentPage.start, this.currentPage.end).filter(item => item)
-  }
-
-  get prevPageLines(): ILine[] {
-    return this.lines.slice(this.prevPage.start, this.prevPage.end).filter(item => item)
-  }
-
-  get nextPageLines(): ILine[] {
-    return this.lines.slice(this.nextPage.start, this.nextPage.end).filter(item => item)
-  }
-
-  get probablyLine(): number {
-    return Number((this.contentHeight / 30).toFixed(0))
+    let startPoint = 0
+    for (let i = 0; i < matchedPoint.length; i++) {
+      this.episodes.push({
+        index: i,
+        title: matchedPoint[i].line,
+        lines: this.lines.slice(startPoint, matchedPoint[i].index)
+      })
+      startPoint = matchedPoint[i].index + 1
+    }
   }
 
   mounted() {
-    console.log(this.probablyLine)
-    console.log(this.currentPage.end)
-    this.currentPage.prev = this.currentPage.end =
-      this.currentPage.start + this.probablyLine
-    console.log(this.currentPage.prev)
-    console.log(this.nextPage.start)
-    this.nextPage.end = this.nextPage.start + this.probablyLine
-    console.log(this.nextPage.end)
-    const observer = new MutationObserver(this.throttle(this.checkHeight, 50))
-    observer.observe((this.$refs.content as HTMLElement), { childList: true, subtree: true })
-    window.addEventListener('resize', this.resetPrev)
     window.addEventListener('keydown', throttle(this.handlePage, 1))
     ;(this.$refs.content as HTMLElement).addEventListener('wheel', this.handlePage)
     this.checkEpisodes()
@@ -374,6 +226,19 @@ export default class App extends Vue {
     // @ts-ignore
     // eslint-disable-next-line no-undef
     GM_setValue(location.pathname, JSON.stringify(newValue))
+  }
+
+  nextEpisode() {
+    this.jumpEpisodes(this.activeEpisode + 1)
+  }
+
+  prevEpisode() {
+    this.jumpEpisodes(this.activeEpisode - 1)
+  }
+
+  jumpEpisodes(episode: number) {
+    console.log(episode)
+    this.activeEpisode = episode
   }
 }
 </script>
