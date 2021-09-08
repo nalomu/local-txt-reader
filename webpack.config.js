@@ -13,6 +13,7 @@ module.exports = env => {
   return {
     mode: dev ? 'development' : 'production',
     entry: [path.resolve(__dirname, 'src', 'main.ts')],
+    devtool: 'cheap-source-map',
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename
@@ -32,7 +33,7 @@ module.exports = env => {
           name: 'Nalomu local TXT reader',
           version: dev ? '[version]-build.[buildNo]' : '[version]',
           updateURL: dev ? `http://127.0.0.1:8080/${filename}` : undefined,
-          match: 'file:///*.txt',
+          include: ['file:///*.txt', 'http://*.txt', 'https://*.txt'],
           grant: [
             'GM_setValue',
             'GM_getValue',
